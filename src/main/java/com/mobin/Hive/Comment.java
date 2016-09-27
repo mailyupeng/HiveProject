@@ -100,7 +100,7 @@ public class Comment {
         String s4 = "";
         if(Num == 2 || Num == 6 || Num == 0){
             s = "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws " +
-                    "WHERE (mth>=? AND mth<=?) AND to_date(s6)>=? AND to_date(s6)<=?)," +
+                    "WHERE (s3a==1 OR s9!=1) AND (mth>=? AND mth<=?) AND to_date(s6)>=? AND to_date(s6)<=?)," +
                     "cx_tmp AS ";
 
             if(Num == 0) {
@@ -112,11 +112,11 @@ public class Comment {
 
             s2 = "(SELECT count(1) AS cx_per,time FROM " +
                     "(SELECT sid  FROM bca " +
-                    "WHERE  mth>=? AND mth<=? AND array_contains(cx,?)) t1 " +
+                    "WHERE (s3a==1 OR s9!=1) AND   mth>=? AND mth<=? AND array_contains(cx,?)) t1 " +
                     "JOIN (SELECT rowkey,time FROM wtmp WHERE array_contains(cx,?)) t4 ON base64(t1.sid)=base64(substr(t4.rowkey,0,16)) GROUP BY time) ";
             s4 = "(SELECT model,time,count(1) AS cot FROM " +
                     "(SELECT sid,cbrdint3 AS model FROM bca " +
-                    "LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE cbrdint3=? AND (mth>=? AND mth<=?)) t3 " +
+                    "LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE (s3a==1 OR s9!=1) AND  cbrdint3=? AND (mth>=? AND mth<=?)) t3 " +
                     "JOIN wtmp " +
                     "ON base64(t3.sid)=base64(substr(wtmp.rowkey,0,16)) " +
                     "GROUP BY model,time) t5 " +
@@ -126,11 +126,11 @@ public class Comment {
             System.out.println(thisMth+"  "+lastMth);
             s3 = "WITH cx_tmp AS " +
                     "(SELECT count(1) AS c,mth AS time " +
-                    "FROM bca WHERE mth>=? AND mth<=? AND array_contains(cx,?) GROUP BY mth) " +
+                    "FROM bca WHERE (s3a==1 OR s9!=1) AND  mth>=? AND mth<=? AND array_contains(cx,?) GROUP BY mth) " +
                     "SELECT model,t5.time,brdint3_cot,c,(brdint3_cot/c) AS percents FROM " +
                     "(SELECT model,time,count(1) AS brdint3_cot FROM " +
                     "(SELECT sid,cbrdint3 AS model,mth AS time FROM bca " +
-                    "LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE cbrdint3=? AND mth>=? AND mth<=?) t1 " +
+                    "LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE (s3a==1 OR s9!=1) AND  cbrdint3=? AND mth>=? AND mth<=?) t1 " +
                     "GROUP BY model,time) t5 " +
                     "JOIN cx_tmp ON(cx_tmp.time=t5.time) ";
         }
