@@ -101,8 +101,8 @@ public class Commentators {
             }
             s3 = "SELECT model,time,count(DISTINCT g1) AS cot FROM " +
                     " (SELECT sid,g1,cbrdint3 AS model FROM " + tableName +
-                    " LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE cbrdint3=? AND mth>=? AND mth<=?) t1" +
-                    " JOIN (SELECT rowkey,to_date(s6) AS time FROM raws WHERE mth>=? AND mth<=? AND to_date(s6)>=? AND  to_date(s6)<=?) t2" +
+                    " LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE (s3a==1 OR s9!=1) AND  cbrdint3=? AND mth>=? AND mth<=?) t1" +
+                    " JOIN (SELECT rowkey,to_date(s6) AS time FROM raws WHERE (s3a==1 OR s9!=1) AND  mth>=? AND mth<=? AND to_date(s6)>=? AND  to_date(s6)<=?) t2" +
                     " ON base64(t1.sid)=base64(substr(t2.rowkey,0,16))" +
                     " GROUP BY model,time";
         }
@@ -110,7 +110,7 @@ public class Commentators {
             System.out.println(11);
             s3 = "SELECT model,time,count(DISTINCT g1) AS cot FROM " +
                     " (SELECT sid,g1,cbrdint3 AS model,mth AS time FROM " + tableName +
-                    " LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE cbrdint3=? AND mth>=? AND mth<=?) t1" +
+                    " LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE (s3a==1 OR s9!=1) AND  cbrdint3=? AND mth>=? AND mth<=?) t1" +
                     " GROUP BY model,time";
         }
 
