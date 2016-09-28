@@ -30,7 +30,7 @@ public class Commentators {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(Date.valueOf(thisTime));
 
-        int thisMth = disMonth(calendar);   //这个月的编号
+        int thisMth = Utils.disMonth(calendar);   //这个月的编号
         int lastMth = thisMth-1;            //上个月的编号
 
         calendar.roll(Calendar.MONTH,false);   //上滚一个月
@@ -44,11 +44,11 @@ public class Commentators {
         //根据开始时间推出三天前的时间
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(Date.valueOf(thisTime));
-        int thisMth = disMonth(calendar);   //今天对应的mth编号
+        int thisMth = Utils.disMonth(calendar);   //今天对应的mth编号
 
         calendar.add(Calendar.DATE,-32);   //上滚三天
         String lastTime = new Date(calendar.getTime().getTime()).toString();//三天前的时间
-        int lastMth = disMonth(calendar);            //三天前的mth编号
+        int lastMth = Utils.disMonth(calendar);            //三天前的mth编号
         System.out.println(thisMth);
         System.out.println(lastMth);
 
@@ -65,11 +65,11 @@ public class Commentators {
         int day = calendar.get(Calendar.DAY_OF_WEEK);//这周的第几天
         calendar.add(Calendar.DATE,-day);           //上滚N天
         String WeekLastDay = new Date(calendar.getTime().getTime()).toString();//上周的最后一天时间
-        int WeekLastDayMth = disMonth(calendar);   //上周的最后一天对应的mth编号
+        int WeekLastDayMth = Utils.disMonth(calendar);   //上周的最后一天对应的mth编号
 
         calendar.add(Calendar.DATE,-168);
         String Before24WeekDay = new Date(calendar.getTime().getTime()).toString();//24周前的第一天
-        int Before24WeekDayMth = disMonth(calendar);            //24周前的第一天对应的mth编号
+        int Before24WeekDayMth = Utils.disMonth(calendar);            //24周前的第一天对应的mth编号
 
         query(model,Before24WeekDayMth,WeekLastDayMth,Before24WeekDay,WeekLastDay,3,6);
     }
@@ -79,7 +79,7 @@ public class Commentators {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(Date.valueOf(thisTime));
 
-        int thisMth = disMonth(calendar) - 1;   //这个月的编号
+        int thisMth = Utils.disMonth(calendar) - 1;   //这个月的编号
         int lastMth = thisMth - 24;            //前24个月的编号
         query(model,lastMth,thisMth,"","",4,1);
     }
@@ -145,27 +145,12 @@ public class Commentators {
         con.close();
     }
 
-
-    //计算两个年份相差多少个月
-    public static int disMonth(Calendar nowTime) throws ParseException {
-        Calendar startTime = Calendar.getInstance();
-        startTime.setTime(Date.valueOf("1999-12-01"));
-        return (nowTime.get(Calendar.YEAR) - startTime.get(Calendar.YEAR))* 12 +
-               nowTime.get(Calendar.MONTH) - startTime.get(Calendar.MONTH);
-    }
-
-
     public static void main(String[] args) throws SQLException, IOException, ParseException {
         Commentators h = new Commentators();
         h.dayLine("162","2016-04-01");
        // h.threeDayLine("162","2016-04-04");
         //h.weekLine("162","2016-04-04");
        // h.monthLine("162","2016-04-04");
-       /* Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse("2016-04-30"));
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.setTime(new SimpleDateFormat("yyyy-MM-dd").parse("1999-12-01"));
-        System.out.println(h.disMonth(calendar));*/
 
     }
 }
