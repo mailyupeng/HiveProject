@@ -1,6 +1,6 @@
 package com.mobin.Hive;
 
-import com.alibaba.fastjson.JSON;
+import com.mobin.Hive.Utils.Utils;
 
 
 import java.io.IOException;
@@ -140,7 +140,7 @@ public class Commentators {
         }
 
         //传输数据
-        TransData.transData(hiveBean);
+        Utils.transData(hiveBean);
         pstm.close();
         con.close();
     }
