@@ -189,10 +189,6 @@ public class Comment {
 //       h.threeDayLine("21","162","2016-04-04");
 //       h.weekLine("21","162","2016-04-04");
 //        h.monthLine("21","162","2016-04-04");
-       /* Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse("2016-04-30"));
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.setTime(new SimpleDateFormat("yyyy-MM-dd").parse("1999-12-01"));
-        System.out.println(h.disMonth(calendar));*/
+
     }
 }
