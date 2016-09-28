@@ -175,8 +175,8 @@ public class Comment {
             }
             i ++;
         }
-
-        transData(hiveBean);
+        //传输数据
+        TransData.transData(hiveBean);
         pstm.close();
         con.close();
     }
@@ -190,32 +190,6 @@ public class Comment {
                nowTime.get(Calendar.MONTH) - startTime.get(Calendar.MONTH);
     }
 
-    //传输数据
-    public static void transData(List<HiveBean> bean){
-        String hiveJSON = JSON.toJSONString(bean);
-        System.out.println(hiveJSON);
-        String urlStr = "http://data.dgchina.com/xingji/Handle/GetData.aspx?model="+hiveJSON;
-        URL url;
-        try {
-            url = new URL(urlStr);
-            URLConnection URLconnection = url.openConnection();
-            HttpURLConnection httpConnection = (HttpURLConnection)URLconnection;
-            httpConnection.setDoOutput(true);
-            httpConnection.setChunkedStreamingMode(hiveJSON.getBytes().length);
-            httpConnection.setRequestMethod("POST");
-
-            DataOutputStream out = new DataOutputStream(httpConnection.getOutputStream());
-            out.writeUTF(hiveJSON);
-            out.flush();
-            out.close();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void main(String[] args) throws SQLException, IOException, ParseException {
         Comment h = new Comment();
