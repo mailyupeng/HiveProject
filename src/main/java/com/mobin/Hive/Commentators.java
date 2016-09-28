@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-//关键指_声量份额(弃)
+//关键指_声量份额
 public class Commentators {
 
     /*
