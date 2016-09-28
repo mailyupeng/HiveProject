@@ -1,16 +1,20 @@
-package com.mobin.Hive;
+package com.mobin.Hive.Utils;
 
 import com.alibaba.fastjson.JSON;
+import com.mobin.Hive.HiveBean;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.*;
+import java.sql.Date;
+import java.text.ParseException;
+import java.util.Calendar;
 import java.util.List;
 
 /**
  * Created by MOBIN on 2016/9/28.
  */
-public class TransData {
+public class Utils {
     public static void transData(List<HiveBean> bean){
         String hiveJSON = JSON.toJSONString(bean);
         System.out.println(hiveJSON);
@@ -36,4 +40,13 @@ public class TransData {
             e.printStackTrace();
         }
     }
+
+    //计算两个年份相差多少个月
+    public static int disMonth(Calendar nowTime) throws ParseException {
+        Calendar startTime = Calendar.getInstance();
+        startTime.setTime(Date.valueOf("1999-12-01"));
+        return (nowTime.get(Calendar.YEAR) - startTime.get(Calendar.YEAR))* 12 +
+                nowTime.get(Calendar.MONTH) - startTime.get(Calendar.MONTH);
+    }
+
 }
