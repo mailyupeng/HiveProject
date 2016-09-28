@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+//关键指_评论声量及声量份额
 public class Comment {
 
     /*
@@ -23,6 +24,9 @@ public class Comment {
     private static Connection con;
     private PreparedStatement pstm;
     private static String tableName = "bca";
+    private static int thisMth;
+    private static int lastMth;
+    private static String lastTime;
 
     //（日线）每天关注该车系的人数,时间轴为30天
     public  void dayLine(String cx,String model,String thisTime) throws SQLException, IOException, ParseException {
