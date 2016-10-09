@@ -148,7 +148,7 @@ public class Brd3Evaluate {
                 "FROM "+
                         "(SELECT model, "+
                                 "time, "+
-                                "sum(pid) over(ORDER BY fm_tmp.time desc rows between CURRENT row and 2 following)AS fm2_cot "+
+                                "sum(pid) over(ORDER BY fm_tmp.time desc rows between CURRENT row and "+Num+" following)AS fm2_cot "+
                                 "FROM fm_tmp "+
                                 "WHERE fm=2) fm2_tmp   "+
                         "JOIN "+
