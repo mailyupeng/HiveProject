@@ -7,10 +7,9 @@ import java.io.IOException;
 import java.sql.*;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-//关键指_评论声量及声量份额
+//关键指_评论声量及声量份额（key=1）
 public class Comment {
 
     /*
@@ -22,74 +21,74 @@ public class Comment {
     * */
     private static HiveDataBaseConnection ds;
     private static Connection con;
-    private PreparedStatement pstm;
+    private static PreparedStatement pstm;
     private static String tableName = "bca";
     private static int thisMth;
     private static int lastMth;
     private static String lastTime;
 
     //（日线）每天关注该车系的人数,时间轴为30天
-    public  void dayLine(String cx,String model,String thisTime) throws SQLException, IOException, ParseException {
-        //根据开始时间推出上个月的时间
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(Date.valueOf(thisTime));
+//    public  void dayLine(String cx,String model,String thisTime) throws SQLException, IOException, ParseException {
+//        //根据开始时间推出上个月的时间
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(Date.valueOf(thisTime));
+//
+//        int thisMth = Utils.disMonth(calendar);   //这个月的编号
+//        int lastMth = thisMth-1;            //上个月的编号
+//
+//        calendar.roll(Calendar.MONTH,false);   //上滚一个月
+//        String lastTime = new Date(calendar.getTime().getTime()).toString();//上个月的时间
+//
+//        query(cx,model,lastMth,thisMth,lastTime,thisTime,1,0);
+//    }
+//
+//    //（三天线）时间轴为31天内30个“三天线”数据
+//    public void threeDayLine(String cx,String model,String thisTime) throws ParseException, SQLException {
+//        //根据开始时间推出三天前的时间
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(Date.valueOf(thisTime));
+//        int thisMth = Utils.disMonth(calendar);   //今天对应的mth编号
+//
+//        calendar.add(Calendar.DATE,-32);   //上滚三天
+//        String lastTime = new Date(calendar.getTime().getTime()).toString();//三天前的时间
+//        int lastMth = Utils.disMonth(calendar);            //三天前的mth编号
+//        System.out.println(thisMth);
+//        System.out.println(lastMth);
+//
+//        query(cx,model,lastMth,thisMth,lastTime,thisTime,2,2);
+//    }
+//
+//
+//    //时间轴为过去24周的周数据
+//    public void weekLine(String cx,String model,String thisTime) throws SQLException, ParseException {
+//        //根据开始时间推出24周前的时间
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(Date.valueOf(thisTime));
+//
+//        int day = calendar.get(Calendar.DAY_OF_WEEK);//这周的第几天
+//        calendar.add(Calendar.DATE,-day);           //上滚N天
+//        String WeekLastDay = new Date(calendar.getTime().getTime()).toString();//上周的最后一天时间
+//        int WeekLastDayMth = Utils.disMonth(calendar);   //上周的最后一天对应的mth编号
+//
+//        calendar.add(Calendar.DATE,-168);
+//        String Before24WeekDay = new Date(calendar.getTime().getTime()).toString();//24周前的第一天
+//        int Before24WeekDayMth = Utils.disMonth(calendar);            //24周前的第一天对应的mth编号
+//
+//        query(cx,model,Before24WeekDayMth,WeekLastDayMth,Before24WeekDay,WeekLastDay,3,6);
+//    }
+//
+//    //时间轴为过去24个月的月数据
+//    public void monthLine(String cx,String model, String thisTime) throws ParseException, SQLException {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(Date.valueOf(thisTime));
+//
+//        int thisMth = Utils.disMonth(calendar) - 1;   //这个月的编号
+//        int lastMth = thisMth - 24;            //前24个月的编号
+//        query(cx,model,lastMth,thisMth,"","",4,1);
+//    }
 
-        int thisMth = Utils.disMonth(calendar);   //这个月的编号
-        int lastMth = thisMth-1;            //上个月的编号
 
-        calendar.roll(Calendar.MONTH,false);   //上滚一个月
-        String lastTime = new Date(calendar.getTime().getTime()).toString();//上个月的时间
-
-        query(cx,model,lastMth,thisMth,lastTime,thisTime,1,0);
-    }
-
-    //（三天线）时间轴为31天内30个“三天线”数据
-    public void threeDayLine(String cx,String model,String thisTime) throws ParseException, SQLException {
-        //根据开始时间推出三天前的时间
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(Date.valueOf(thisTime));
-        int thisMth = Utils.disMonth(calendar);   //今天对应的mth编号
-
-        calendar.add(Calendar.DATE,-32);   //上滚三天
-        String lastTime = new Date(calendar.getTime().getTime()).toString();//三天前的时间
-        int lastMth = Utils.disMonth(calendar);            //三天前的mth编号
-        System.out.println(thisMth);
-        System.out.println(lastMth);
-
-        query(cx,model,lastMth,thisMth,lastTime,thisTime,2,2);
-    }
-
-
-    //时间轴为过去24周的周数据
-    public void weekLine(String cx,String model,String thisTime) throws SQLException, ParseException {
-        //根据开始时间推出24周前的时间
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(Date.valueOf(thisTime));
-
-        int day = calendar.get(Calendar.DAY_OF_WEEK);//这周的第几天
-        calendar.add(Calendar.DATE,-day);           //上滚N天
-        String WeekLastDay = new Date(calendar.getTime().getTime()).toString();//上周的最后一天时间
-        int WeekLastDayMth = Utils.disMonth(calendar);   //上周的最后一天对应的mth编号
-
-        calendar.add(Calendar.DATE,-168);
-        String Before24WeekDay = new Date(calendar.getTime().getTime()).toString();//24周前的第一天
-        int Before24WeekDayMth = Utils.disMonth(calendar);            //24周前的第一天对应的mth编号
-
-        query(cx,model,Before24WeekDayMth,WeekLastDayMth,Before24WeekDay,WeekLastDay,3,6);
-    }
-
-    //时间轴为过去24个月的月数据
-    public void monthLine(String cx,String model, String thisTime) throws ParseException, SQLException {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(Date.valueOf(thisTime));
-
-        int thisMth = Utils.disMonth(calendar) - 1;   //这个月的编号
-        int lastMth = thisMth - 24;            //前24个月的编号
-        query(cx,model,lastMth,thisMth,"","",4,1);
-    }
-
-
-    public void query(String cx,String model,int lastMth,int thisMth,String lastTime,String thisTime, int type,int Num) throws SQLException {
+    public static void query(String cx,String model,int lastMth,int thisMth,String lastTime,String thisTime, int type,int Num) throws SQLException {
         ds = new HiveDataBaseConnection();
         con = ds.getConnection();
         System.out.println(lastMth + "  " + thisMth);
@@ -188,8 +187,8 @@ public class Comment {
 
 
     public static void main(String[] args) throws SQLException, IOException, ParseException {
-        Comment h = new Comment();
-        h.dayLine("21","162","2016-04-01");
+        Common common = new Common();
+       // h.dayLine("21","162","2016-04-01");  //时间从服务器中获取
 //       h.threeDayLine("21","162","2016-04-04");
 //       h.weekLine("21","162","2016-04-04");
 //        h.monthLine("21","162","2016-04-04");
