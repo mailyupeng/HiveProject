@@ -4,17 +4,17 @@ package com.mobin.Hive;
  * Created by MOBIN on 2016/9/22.
  */
 public class HiveBean {
-    private String model;//车系
+    private String model;
     private String time;
-    private int cot;
+    private int brd3_cot;
+    private int g1_cot;
+    private double per;
+    private double per1;
     private int type;
-    private double percent;
 
     public HiveBean() {
 
     }
-
-
 
     public String getModel() {
         return model;
@@ -32,12 +32,36 @@ public class HiveBean {
         this.time = time;
     }
 
-    public int getCot() {
-        return cot;
+    public int getBrd3_cot() {
+        return brd3_cot;
     }
 
-    public void setCot(int cot) {
-        this.cot = cot;
+    public void setBrd3_cot(int brd3_cot) {
+        this.brd3_cot = brd3_cot;
+    }
+
+    public int getG1_cot() {
+        return g1_cot;
+    }
+
+    public void setG1_cot(int g1_cot) {
+        this.g1_cot = g1_cot;
+    }
+
+    public double getPer() {
+        return per;
+    }
+
+    public void setPer(double per) {
+        this.per = per;
+    }
+
+    public double getPer1() {
+        return per1;
+    }
+
+    public void setPer1(double per1) {
+        this.per1 = per1;
     }
 
     public int getType() {
@@ -46,13 +70,5 @@ public class HiveBean {
 
     public void setType(int type) {
         this.type = type;
-    }
-
-    public double getPercent() {
-        return percent;
-    }
-
-    public void setPercent(double percent) {
-        this.percent = percent;
     }
 }
