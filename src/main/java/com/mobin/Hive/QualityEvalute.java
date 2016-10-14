@@ -21,15 +21,16 @@ public class QualityEvalute {
 
 
 
-    public static void query(int lastMth,int thisMth,String lastTime,String thisTime, int type,int Num) throws SQLException {
+    public static void query(int lastMth,int startMth,String lastTime,String startTime, int type,int Num) throws SQLException {
         ds = new HiveDataBaseConnection();
         con = ds.getConnection();
-        System.out.println(lastMth + "  " + thisMth);
+        System.out.println(lastMth + "  " + startMth);
         StringBuffer sb = new StringBuffer();
 
         String hql ="";
         if(Num == 0){
-            hql = "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws WHERE (s3a=='1' OR s9!='1') AND  (mth>=? AND mth<=?) AND to_date(s6)>=?AND to_date(s6)<=?), "+
+            hql =  "--日线:质量评价\n" +
+                    "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws WHERE (s3a=='1' OR s9!='1') AND  (mth>=? AND mth<=?) AND to_date(s6)>=?AND to_date(s6)<=?), "+
             "each_g1 AS "+
                     "(SELECT concat_ws(',',model,wtmp.time) AS mt,count(DISTINCT g1) AS g1_cot FROM "+
                                     "(SELECT sid,g1,cbrdint3 AS model FROM bca "+
@@ -55,7 +56,8 @@ public class QualityEvalute {
             "JOIN each_g1 ON(each_g1.mt=each_iqs.mt) ";
 
         }else if(Num == 2 || Num == 6){
-            hql = "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws WHERE (s3a=='1' OR s9!='1') AND  (mth>=? AND mth<=?) AND to_date(s6)>=? AND to_date(s6)<=?), "+
+            hql = "--三天线/日线:质量评价\n" +
+                    "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws WHERE (s3a=='1' OR s9!='1') AND  (mth>=? AND mth<=?) AND to_date(s6)>=? AND to_date(s6)<=?), "+
             "each_g1 AS "+
                     "(SELECT concat_ws(',',model,wtmp.time) AS mt,count(DISTINCT g1) AS g1_cot FROM "+
                                     "(SELECT sid,g1,cbrdint3 AS model FROM bca "+
@@ -84,7 +86,8 @@ public class QualityEvalute {
             "JOIN three_each_g1 ON(three_each_iqs.mt=three_each_g1.mt) "+
             "JOIN three_all_iqs ON(three_all_iqs.mt=three_each_g1.mt) ";
         }else {  //Num == 1
-            hql = "WITH g1tmp AS "+
+            hql = "--月线:质量评价\n" +
+                    "WITH g1tmp AS "+
                     "(SELECT concat_ws(',',model,time) AS mt,count(DISTINCT g1) AS g1_cot FROM "+
                                     "(SELECT sid,g1,cbrdint3 AS model,mth AS time FROM bca "+
                                             "LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 WHERE (s3a==1 OR s9!=1) AND mth>=? AND mth<=? AND size(iqsint2)>=1 AND cbrdint3!='') t1 "+
@@ -113,18 +116,18 @@ public class QualityEvalute {
 
         if(Num == 0 || Num == 2 || Num == 6){
             pstm.setInt(1,lastMth);
-            pstm.setInt(2,thisMth);
+            pstm.setInt(2,startMth);
             pstm.setString(3,lastTime);
-            pstm.setString(4,thisTime);
+            pstm.setString(4,startTime);
             pstm.setInt(5,lastMth);
-            pstm.setInt(6,thisMth);
+            pstm.setInt(6,startMth);
             pstm.setInt(7,lastMth);
-            pstm.setInt(8,thisMth);
+            pstm.setInt(8,startMth);
         }else {  //Num == 1 月线
             pstm.setInt(1,lastMth);
-            pstm.setInt(2,thisMth);
+            pstm.setInt(2,startMth);
             pstm.setInt(3,lastMth);
-            pstm.setInt(4,thisMth);
+            pstm.setInt(4,startMth);
         }
 
         ResultSet rs = pstm.executeQuery();
