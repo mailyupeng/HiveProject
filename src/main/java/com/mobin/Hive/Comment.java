@@ -12,14 +12,6 @@ import java.util.List;
 
 //关键指_评论声量及声量份额（key=1）
 public class Comment {
-
-    /*
-      query函数的最后个参数
-    * 日线：0
-    * 三天线：2
-    * 周线：6
-    * 月线：1
-    * */
     private static HiveDataBaseConnection ds;
     private static Connection con;
     private static PreparedStatement pstm;
@@ -28,15 +20,16 @@ public class Comment {
 
 
 
-    public static void query(int lastMth,int thisMth,String lastTime,String thisTime, int type,int Num) throws SQLException {
+    public static void query(int lastMth,int startMth,String lastTime,String startTime, int type,int Num) throws SQLException {
         ds = new HiveDataBaseConnection();
         con = ds.getConnection();
-        System.out.println(lastMth + "  " + thisMth);
+        System.out.println(lastMth + "  " + startMth);
         StringBuffer sb = new StringBuffer();
 
         String hql ="";
         if(Num == 0){
-            hql = "WITH wtmp AS ( "+
+            hql ="--日线:评论声量及声量份额\n" +
+                    "WITH wtmp AS ( "+
                     "SELECT rowkey, "+
                     "to_date(s6) AS time, "+
                     "cx "+
@@ -98,7 +91,8 @@ public class Comment {
             "ON(cx_tmp.cxt=t6.cxt)";
 
         }else if(Num == 2 || Num == 6){
-            hql ="WITH wtmp AS(  "+
+            hql ="--三天线/周线:评论声量及声量份额\n" +
+                    "WITH wtmp AS(  "+
                     "SELECT rowkey,  "+
                     "to_date(s6) AS time,  "+
                     "cx  "+
@@ -160,7 +154,8 @@ public class Comment {
             "JOIN cx_tmp "+
             "ON(cx_tmp.cxt=t6.cxt)";
         }else {  //Num == 1
-           hql = "WITH cx_tmp AS "+
+           hql = "--月线:评论声量及声量份额\n" +
+                   "WITH cx_tmp AS "+
             "(SELECT concat_ws(',',ccx,mth) AS cxt, "+
             "count(1) AS c "+
             "FROM "+tableName+" LATERAL VIEW explode(cx) tcx AS ccx "+
@@ -207,18 +202,18 @@ public class Comment {
 
         if(Num == 0 || Num == 2 || Num == 6){
             pstm.setInt(1,lastMth);
-            pstm.setInt(2,thisMth);
+            pstm.setInt(2,startMth);
             pstm.setString(3,lastTime);
-            pstm.setString(4,thisTime);
+            pstm.setString(4,startTime);
             pstm.setInt(5,lastMth);
-            pstm.setInt(6,thisMth);
+            pstm.setInt(6,startMth);
             pstm.setInt(7,lastMth);
-            pstm.setInt(8,thisMth);
-        }else {  //Num == 1 月线
+            pstm.setInt(8,startMth);
+        }else {  //Num == 1月线
             pstm.setInt(1,lastMth);
-            pstm.setInt(2,thisMth);
+            pstm.setInt(2,startMth);
             pstm.setInt(3,lastMth);
-            pstm.setInt(4,thisMth);
+            pstm.setInt(4,startMth);
         }
 
         ResultSet rs = pstm.executeQuery();
