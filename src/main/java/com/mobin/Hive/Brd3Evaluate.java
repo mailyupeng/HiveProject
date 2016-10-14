@@ -28,15 +28,16 @@ public class Brd3Evaluate {
     private static String tableName = "bca";
 
 
-    public static void query(int lastMth,int thisMth,String lastTime,String thisTime, int type,int Num) throws SQLException {
+    public static void query(int lastMth,int startMth,String lastTime,String startTime, int type,int Num) throws SQLException {
         ds = new HiveDataBaseConnection();
         con = ds.getConnection();
-        System.out.println(lastMth + "  " + thisMth);
+        System.out.println(lastMth + "  " + startMth);
         StringBuffer sb = new StringBuffer();
-
+        System.out.println(Num);
         String hql = "";
         if(Num == 0){
-            hql = "WITH wtmp AS( "+
+            hql = "--日线:品牌总体评价\n " +
+                    "WITH wtmp AS( "+
                     "SELECT rowkey, "+
                     "to_date(s6) AS time, "+
                     "cx "+
@@ -78,67 +79,64 @@ public class Brd3Evaluate {
             "ON(fm_tmp.mt=fm2_tmp.mt) "+
             "WHERE fm2_tmp.fm=2 "+
             "GROUP BY fm2_tmp.mt";
-
-            if(Num == 2 || Num == 6){
-               hql = "WITH wtmp AS ( "+
-                        "SELECT rowkey, "+
-                        "to_date(s6) AS time, "+
-                        "cx "+
-                "FROM raws "+
-                "WHERE (s3a==1 "+
-                        "OR s9!=1) "+
-                "AND (mth>=? "+
-                        "AND mth<=?) "+
-                "AND to_date(s6)>=? "+
-                        "AND to_date(s6)<=?), "+
-                "fm_tmp AS(  "+
-                "SELECT count(DISTINCT g1) AS g1_cot, "+
-                "count(DISTINCT pid) AS pid, "+
-                "concat_ws(',',model,wtmp.time) AS mt, "+
-                        "fm "+
-                "FROM "+
-                        "(SELECT sid, "+
-                                "fm, "+
-                                "cbrdint3 AS model, "+
-                                "base64(substr(rowkey,0,10)) AS pid, "+
-                                "g1 "+
-                                "FROM bca LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 "+
-                                "WHERE (s3a==1 "+
-                                        "OR s9!=1) "+
-                                "AND mth>=? AND mth<=?) t1 "+
-                "JOIN wtmp "+
-                "ON base64(t1.sid)=base64(substr(wtmp.rowkey,0,16)) "+
-                "GROUP BY model, "+
-                        "wtmp.time, "+
-                        "fm), "+
-                "all_tmp AS ( "+
-                        "SELECT sum(pid) AS pid, "+
-                "sum(g1_cot) AS g1_cot, "+
-                        "mt "+
-                "FROM fm_tmp "+
-                "GROUP BY mt)   "+
-                "SELECT split(fm2_tmp.mt,',')[0] AS model "+
-                       "split(fm2_tmp.mt,',')[1] AS time"+
-                        "g1_cot, "+
-                        "((fm2_cot/all_cot)*100) AS percents "+
-                "FROM "+
-                        "(SELECT mt, "+
-                                "sum(pid) over(ORDER BY fm_tmp.mt desc rows between CURRENT row and 2 following) AS fm2_cot "+
-                                "FROM fm_tmp "+
-                                "WHERE fm=2) fm2_tmp   "+
-                        "JOIN "+
-                "(SELECT mt, "+
-                        "sum(pid) over(ORDER BY all_tmp.mt desc rows between CURRENT row and 2 following) AS all_cot,  "+
-                "sum(g1_cot) over(ORDER BY all_tmp.mt desc rows between CURRENT row and 2 following) AS g1_cot    "+
-                "FROM all_tmp) all_tmp1 "+
-                "ON (all_tmp1.mt=fm2_tmp.mt)";
-            }else{  //Num == 0
-
-            }
-
+        }  else if(Num == 2 || Num == 6){
+            hql ="--三天线/周线:品牌总体评价\n " +
+                    "WITH wtmp AS ( "+
+                    "SELECT rowkey, "+
+                    "to_date(s6) AS time, "+
+                    "cx "+
+                    "FROM raws "+
+                    "WHERE (s3a==1 "+
+                    "OR s9!=1) "+
+                    "AND (mth>=? "+
+                    "AND mth<=?) "+
+                    "AND to_date(s6)>=? "+
+                    "AND to_date(s6)<=?), "+
+                    "fm_tmp AS(  "+
+                    "SELECT count(DISTINCT g1) AS g1_cot, "+
+                    "count(DISTINCT pid) AS pid, "+
+                    "concat_ws(',',model,wtmp.time) AS mt, "+
+                    "fm "+
+                    "FROM "+
+                    "(SELECT sid, "+
+                    "fm, "+
+                    "cbrdint3 AS model, "+
+                    "base64(substr(rowkey,0,10)) AS pid, "+
+                    "g1 "+
+                    "FROM bca LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 "+
+                    "WHERE (s3a==1 "+
+                    "OR s9!=1) "+
+                    "AND mth>=? AND mth<=?) t1 "+
+                    "JOIN wtmp "+
+                    "ON base64(t1.sid)=base64(substr(wtmp.rowkey,0,16)) "+
+                    "GROUP BY model, "+
+                    "wtmp.time, "+
+                    "fm), "+
+                    "all_tmp AS ( "+
+                    "SELECT sum(pid) AS pid, "+
+                    "sum(g1_cot) AS g1_cot, "+
+                    "mt "+
+                    "FROM fm_tmp "+
+                    "GROUP BY mt)   "+
+                    "SELECT split(fm2_tmp.mt,',')[0] AS model, "+
+                    "split(fm2_tmp.mt,',')[1] AS time,"+
+                    "g1_cot, "+
+                    "((fm2_cot/all_cot)*100) AS percents "+
+                    "FROM "+
+                    "(SELECT mt, "+
+                    "sum(pid) over(ORDER BY fm_tmp.mt desc rows between CURRENT row and 2 following) AS fm2_cot "+
+                    "FROM fm_tmp "+
+                    "WHERE fm=2) fm2_tmp   "+
+                    "JOIN "+
+                    "(SELECT mt, "+
+                    "sum(pid) over(ORDER BY all_tmp.mt desc rows between CURRENT row and 2 following) AS all_cot,  "+
+                    "sum(g1_cot) over(ORDER BY all_tmp.mt desc rows between CURRENT row and 2 following) AS g1_cot    "+
+                    "FROM all_tmp) all_tmp1 "+
+                    "ON (all_tmp1.mt=fm2_tmp.mt)";
         }
-        if(Num == 1){
-            hql = "WITH fm_tmp AS (   "+
+        else {//Num == 1
+            hql = "--月线:品牌总体评价\n" +
+                    "WITH fm_tmp AS (   "+
             "SELECT count(DISTINCT g1) AS g1_cot, "+
             "count(DISTINCT pid) AS pid, "+
             "concat_ws(',',model,mth) AS mt, "+
@@ -177,9 +175,9 @@ public class Brd3Evaluate {
         pstm = con.prepareStatement(hql);
 
             pstm.setInt(1,lastMth);
-            pstm.setInt(2,thisMth);
+            pstm.setInt(2,startMth);
             pstm.setString(3,lastTime);
-            pstm.setString(4,thisTime);
+            pstm.setString(4,startTime);
             pstm.setInt(5,lastMth);
             pstm.setInt(6,lastMth);
 
