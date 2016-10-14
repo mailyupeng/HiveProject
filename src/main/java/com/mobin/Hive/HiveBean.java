@@ -8,6 +8,7 @@ public class HiveBean {
     private String time;
     private int brd3_cot;
     private int g1_cot;
+    private String s3a_attimg;
     private double per;
     private double per1;
     private int type;
@@ -46,6 +47,14 @@ public class HiveBean {
 
     public void setG1_cot(int g1_cot) {
         this.g1_cot = g1_cot;
+    }
+
+    public String getS3a_attimg() {
+        return s3a_attimg;
+    }
+
+    public void setS3a_attimg(String s3a_attimg) {
+        this.s3a_attimg = s3a_attimg;
     }
 
     public double getPer() {
