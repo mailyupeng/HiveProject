@@ -28,13 +28,14 @@ public class Source {
     private static String tableName = "bca";
 
 
-    public static void query(int lastMth,int thisMth,String lastTime,String thisTime, int type,int Num) throws SQLException {
+    public static void query(int lastMth,int startMth,String lastTime,String startTime, int type,int Num) throws SQLException {
         ds = new HiveDataBaseConnection();
         con = ds.getConnection();
-        System.out.println(lastMth + "  " + thisMth);
+        System.out.println(lastMth + "  " + startMth);
         String hql = "";
         if(Num == 0){   //日线
-            hql = "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws WHERE (s3a=='1' OR s9!='1') AND  (mth>=? AND mth<=?) AND to_date(s6)>=? AND to_date(s6)<=?), "+
+            hql = "--日线:声量来源\n" +
+                    "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws WHERE (s3a=='1' OR s9!='1') AND  (mth>=? AND mth<=?) AND to_date(s6)>=? AND to_date(s6)<=?), "+
             "cx_tmp AS "+
                     "(SELECT concat_ws(',',model,time) AS mt,s3a,count(1) AS s_cot FROM "+
                                     "(SELECT sid,s3a,cbrdint3 AS model FROM bca "+
@@ -52,7 +53,8 @@ public class Source {
             "JOIN cx_tmp ON(cx_tmp.mt=t5.mt)";
 
         }else if(Num == 2 || Num == 6){  //三天线
-            hql = "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws WHERE (s3a=='1' OR s9!='1') AND  (mth>=? AND mth<=?) AND to_date(s6)>=? AND to_date(s6)<=?), "+
+            hql = "--三天线/周线:声量来源\n" +
+                    "WITH wtmp AS (SELECT rowkey,to_date(s6) AS time,cx FROM raws WHERE (s3a=='1' OR s9!='1') AND  (mth>=? AND mth<=?) AND to_date(s6)>=? AND to_date(s6)<=?), "+
             "cx_tmp AS "+
             "(SELECT s3a,mt,sum(c) over(PARTITION BY s3a ORDER BY mt DESC rows between CURRENT row and 2 following) AS cx_per FROM "+
                     "(SELECT count(1) AS c,concat_ws(',',model,time) AS mt,s3a FROM "+
@@ -61,7 +63,7 @@ public class Source {
                                             "WHERE (s3a==',' OR s9!=',') AND mth>=? AND mth<=? AND s3a!=4 AND cbrdint3!='') t1 "+
                             "JOIN wtmp ON base64(t1.sid)=base64(substr(wtmp.rowkey,0,16)) GROUP BY model,time,s3a) "+
             "t2) "+
-            "SELECT model,time,s3a,brd3_cot AS brd3_cot, "+
+            "SELECT model,time,s3a,brdint3_cot AS brd3_cot, "+
             "(cx_per/brdint3_cot) AS pre FROM "+
                     "(SELECT model,time,t5.mt,cot,(sum(cot) over(ORDER BY mt DESC rows between CURRENT row and 2 following)) AS brdint3_cot FROM "+
                     "(SELECT concat_ws(',',model,time) AS mt,count(1) AS cot,model,time FROM "+
@@ -72,7 +74,8 @@ public class Source {
                             "GROUP BY model,time) t5)t5 "+
             "JOIN cx_tmp ON (cx_tmp.mt=t5.mt) ";
         }else {  //月线
-            hql = "WITH cx_tmp AS "+
+            hql = "--周线:声量来源\n" +
+                    "WITH cx_tmp AS "+
             "(SELECT s3a,count(1) AS c,concat_ws(',',cbrdint3,mth) AS mt "+
             "FROM bca LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3 "+
             "WHERE (s3a=='1' OR s9!='1') AND  mth>=? AND mth<=? GROUP BY cbrdint3,mth,s3a) "+
@@ -89,18 +92,18 @@ public class Source {
         pstm = con.prepareStatement(hql);
         if(Num == 0 || Num == 2 || Num == 6){
             pstm.setInt(1,lastMth);
-            pstm.setInt(2,thisMth);
+            pstm.setInt(2,startMth);
             pstm.setString(3,lastTime);
-            pstm.setString(4,thisTime);
+            pstm.setString(4,startTime);
             pstm.setInt(5,lastMth);
-            pstm.setInt(6,thisMth);
+            pstm.setInt(6,startMth);
             pstm.setInt(7,lastMth);
-            pstm.setInt(8,thisMth);
+            pstm.setInt(8,startMth);
         }else if(Num == 1){
             pstm.setInt(1,lastMth);
-            pstm.setInt(2,thisMth);
+            pstm.setInt(2,startMth);
             pstm.setInt(3,lastMth);
-            pstm.setInt(4,thisMth);
+            pstm.setInt(4,startMth);
         }
         ResultSet rs = pstm.executeQuery();
         List<HiveBean> hiveBean = new ArrayList();
