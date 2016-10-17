@@ -13,7 +13,7 @@ public class HiveDataBaseConnection {
     private final static String DriverName = "org.apache.hive.jdbc.HiveDriver";
     private final static String URL = "jdbc:hive2://master36:10003/default";
     private final static String UserName = "hadoop";
-    private final static String Password = "";
+    private final static String Password = "";  //默认为空
     private Connection con;
 
     public HiveDataBaseConnection(){
@@ -31,7 +31,7 @@ public class HiveDataBaseConnection {
         return con;
     }
 
-    public void Close(){
+    public void close(){
             try {
                 if(con != null)
                   con.close();

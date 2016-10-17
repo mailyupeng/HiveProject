@@ -236,7 +236,7 @@ public class Comment {
        System.out.println(JSON.toJSONString(hiveBean));
         Utils.transData(hiveBean);
         pstm.close();
-        con.close();
+        ds.close();
     }
 
 

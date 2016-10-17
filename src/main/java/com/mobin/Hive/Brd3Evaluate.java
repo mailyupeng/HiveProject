@@ -201,7 +201,7 @@ public class Brd3Evaluate {
         System.out.println(JSON.toJSONString(hiveBean));
        // Utils.transData(hiveBean);
         pstm.close();
-        con.close();
+        ds.close();
     }
 
     public static void main(String[] args) throws SQLException, IOException, ParseException {
