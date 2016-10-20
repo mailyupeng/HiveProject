@@ -42,7 +42,6 @@ WHERE fm2_tmp.fm=2
 GROUP BY fm2_tmp.mt;
 
 
-
 --三天线
 WITH wtmp AS (
     SELECT rowkey,
@@ -81,9 +80,6 @@ all_tmp AS (
            mt
 	FROM fm_tmp
 	GROUP BY mt)  --统计一天内的文章数和人数
-INSERT OVERWRITE LOCAL DIRECTORY "/home/hadoop/result/品牌总体评价-ALL-日线-1"
-ROW FORMAT DELIMITED
-FIELDS TERMINATED BY ','
 SELECT fm2_tmp.mt,
 	   all_cot,
 	   fm2_cot,
@@ -100,7 +96,6 @@ JOIN
            sum(g1_cot) over(ORDER BY all_tmp.mt desc rows between CURRENT row and 2 following) AS g1_cot   --三天内总人数
     FROM all_tmp) all_tmp1
 ON (all_tmp1.mt=fm2_tmp.mt);
-
 
 
 

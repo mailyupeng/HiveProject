@@ -1,0 +1,47 @@
+（如果在操作中没有用到HBase的映射表则在启动时可以去掉HBase相关包，只引入mysql驱动包）
+(--master yarn-client为yarn-client模式，
+ --master spark://192.168.0.36:7077为Spark独立模式
+ --master local为本地单机模式)
+
+./spark-shell --master yarn-client --executor-memory 4g\
+--jars /usr/local/hive/lib/mysql-connector-java-5.1.38-bin.jar,\
+/usr/local/hive/lib/hive-hbase-handler-1.2.1.jar,\
+/usr/local/hbase/lib/hbase-protocol-1.1.2.jar,\
+/usr/local/hbase/lib/htrace-core-3.1.0-incubating.jar,\
+/usr/local/hbase/lib/protobuf-java-2.5.0.jar,\
+/usr/local/hbase/lib/hbase-common-1.1.2.jar,\
+/usr/local/hbase/lib/hbase-client-1.1.2.jar,\
+/usr/local/hbase/lib/guava-12.0.1.jar,\
+/usr/local/hbase/lib/hbase-server-1.1.2.jar\
+--files /usr/local/hbase/conf/hbase-site.xml\
+
+./spark-sql --master spark://192.168.0.36:7077 --executor-memory 4g \
+--jars /usr/local/hive/lib/mysql-connector-java-5.1.38-bin.jar,\
+/usr/local/hive/lib/hive-hbase-handler-1.2.1.jar,\
+/usr/local/hbase/lib/hbase-protocol-1.1.2.jar,\
+/usr/local/hbase/lib/htrace-core-3.1.0-incubating.jar,\
+/usr/local/hbase/lib/protobuf-java-2.5.0.jar,\
+/usr/local/hbase/lib/hbase-common-1.1.2.jar,\
+/usr/local/hbase/lib/hbase-client-1.1.2.jar,\
+/usr/local/hbase/lib/guava-12.0.1.jar,\
+/usr/local/hbase/lib/hbase-server-1.1.2.jar \
+--files /usr/local/hbase/conf/hbase-site.xml
+
+./sparkR --master spark://192.168.0.36:7077 --executor-memory 4g\
+--jars /usr/local/hive/lib/mysql-connector-java-5.1.38-bin.jar,\
+/usr/local/hive/lib/hive-hbase-handler-1.2.1.jar,\
+/usr/local/hbase/lib/hbase-protocol-1.1.2.jar,\
+/usr/local/hbase/lib/htrace-core-3.1.0-incubating.jar,\
+/usr/local/hbase/lib/protobuf-java-2.5.0.jar,\
+/usr/local/hbase/lib/hbase-common-1.1.2.jar,\
+/usr/local/hbase/lib/hbase-client-1.1.2.jar,\
+/usr/local/hbase/lib/guava-12.0.1.jar,\
+/usr/local/hbase/lib/hbase-server-1.1.2.jar\
+--files /usr/local/hbase/conf/hbase-site.xml
+--conf "spark.executor.extraJavaOptions=-XX:MaxDirectMemorySize=2g -XX:-UseGCOverheadLimit" \
+--conf spark.driver.memory=2g --conf spark.driver.maxResultSize=2g \
+--conf spark.executor.cores=1\
+
+参数说明:
+-XX:MaxDirectMemorySize=2g(设置最大堆外内存,避免出现java.lang.OutOfMemoryError: Direct buffer memory)
+-XX:-UseGCOverheadLimit(关闭GC保护机制)
