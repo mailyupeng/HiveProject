@@ -1,4 +1,4 @@
-package com.mobin.Hive;
+package com.mobin.Hive.KPI;
 
 import org.apache.hadoop.hive.ql.metadata.Hive;
 

@@ -1,9 +1,12 @@
 package com.mobin.Hive.WebSocket;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.annotations.VisibleForTesting;
+import com.mobin.Hive.search.Search;
 
 import javax.websocket.*;
 import java.net.URI;
+import java.util.List;
 
 /**
  * Created by MOBIN on 2016/10/13 .
@@ -15,16 +18,48 @@ public class SearchClient {
     private String time;
     private String message;
 
+
     static class Message{
-        protected String user;
-        protected String model;
-        protected String time;
-        protected int brd3_cot;
-        protected int g1_cot;
-        protected String s3a_attimg;
-        protected double per;
-        protected double per1;
-        protected int type;
+        public String key;
+        public String startTime;
+        public String endTime;
+        public List<Author> authorList;
+        public List<Keyword> keyWordList;
+        public String model;
+        public String time;
+        public int brd3_cot;
+        public int g1_cot;
+        public String s3a_attimg;
+        public double per;
+        public double per1;
+        public int type;
+
+        @Override
+        public String toString() {
+            return "Message{" +
+                    "key='" + key + '\'' +
+                    ", startTime='" + startTime + '\'' +
+                    ", endTime='" + endTime + '\'' +
+                    ", authorList=" + authorList +
+                    ", keyWordList=" + keyWordList +
+                    ", model='" + model + '\'' +
+                    ", time='" + time + '\'' +
+                    ", brd3_cot=" + brd3_cot +
+                    ", g1_cot=" + g1_cot +
+                    ", s3a_attimg='" + s3a_attimg + '\'' +
+                    ", per=" + per +
+                    ", per1=" + per1 +
+                    ", type=" + type +
+                    '}';
+        }
+    }
+
+    static class Keyword{
+        public String type;
+        public String keyWord;
+    }
+    static class Author{
+        public String author;
     }
 
 
@@ -35,20 +70,44 @@ public class SearchClient {
 
     @OnMessage
     public void onMessage(String message) {
+        //System.out.println(message);
         SearchClient searchBean = JSON.parseObject(message,SearchClient.class);
         if(!searchBean.sender.equals("mobin")){  //判断是否是自己的发送信息
             Message ms = JSON.parseObject(searchBean.message,Message.class); //客户端发送过来的message JSON是查询所需的数据
-            System.out.println(ms.model);
-            System.out.println(message+ "message");
-            System.out.println(searchBean.sender);
-            StringBuffer sb = new StringBuffer();
-            //HQL
-            if(ms.user != null)
-                sb.append(" AND g1=" + ms.user);
-            String modelCondition = ms.model != null ? (" AND model=" + ms.model) : ("默认的值");  //model条件
-            sb.append(modelCondition);
-            String hql = "";
+
+            //拼接查询条件
+            StringBuffer condition = new StringBuffer();
+            if(ms.authorList.size()>=1){
+                List<Author> authors = ms.authorList;
+                condition.append(" AND ");
+                condition.append("(");
+                for(int i = 0; i < authors.size(); i ++){
+                    if(i == 0)
+                        condition.append("g1=" + authors.get(i).author + "");
+                    else
+                        condition.append(" OR g1=" + authors.get(i).author + "");
+                }
+                condition.append(")");
+            }
+            //B2对应品牌   B3对应车系
+            for(Keyword keywords: ms.keyWordList){
+                if(keywords.type.equals("B2")){
+                    condition.append(" AND b2a=" + keywords.keyWord);
+                }else if(keywords.type.equals("B3")){
+                    condition.append(" OR b3b=" + keywords.keyWord);
+                }
+                else if(keywords.type.equals("C")){
+                    condition.append(" AND c6=" + keywords.keyWord);
+                }else if(keywords.type.equals("A")){
+                    condition.append(" AND A4=" + keywords.keyWord);
+                }
+            }
+
+
+            System.out.println(condition.toString());
+            Search.query(condition.toString(),20); //执行HQL
         }
+
 
     }
 
@@ -66,7 +125,7 @@ public class SearchClient {
                     while (true) {
                         session.getBasicRemote().sendText("\"测试" + count++ + "\""); // 发送文本消息
                         Thread.sleep(5000);
-            }
+                    }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,5 +133,30 @@ public class SearchClient {
 
     public static void main(String[] args) {
         SearchClient.websocketTest();
+    }
+
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
