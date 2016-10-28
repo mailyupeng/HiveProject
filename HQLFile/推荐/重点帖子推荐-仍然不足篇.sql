@@ -1,7 +1,8 @@
 WITH tmp AS(
-SELECT substr(rowkey,0,10) AS sid,cbrdint3 FROM bca
+SELECT substr(rowkey,0,10) AS sid,cbrdint3 FROM credit_test
 LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3
 WHERE mth=${hivevar.time}
+AND s9>1 AND fm=1
 ),
 cot_tmp AS(
 SELECT sid,count(DISTINCT cbrdint3) AS cot FROM tmp

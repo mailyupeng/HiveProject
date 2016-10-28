@@ -40,6 +40,7 @@ att_tmp AS(
 SELECT att_tmp.cbrdint3 AS model,
        att_tmp.s6 AS time,
        g1_cot,
+       cattimg2,
        att_cot/g1_cot AS per
 FROM g1_tmp
 JOIN att_tmp

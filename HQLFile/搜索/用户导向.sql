@@ -1,3 +1,4 @@
+--搜索组-用户
 SELECT s4,
        s6,
        s1,
@@ -6,7 +7,7 @@ SELECT s4,
        v
 FROM
     (SELECT substr(rowkey,0,10) AS sid,
-            (count(1)+1)*count(g1)*count(b2a) AS v
+            (count(substr(rowkey,0,10))+1)*count(g1)*count(b2a) AS v  --count(substr(rowkey,0,10)sid频数
     FROM credit_test
     WHERE s9>1
     AND fm=1
@@ -17,3 +18,4 @@ LIMIT ${hivevar:limit}
 ) credit
 JOIN raws
 ON raws.rowkey=credit.sid
+

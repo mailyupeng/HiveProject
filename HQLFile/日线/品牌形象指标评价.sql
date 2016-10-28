@@ -26,9 +26,10 @@ att_tmp AS(
 			        AND to_date(s6)>=${hivevar:lasttime}
 			        AND to_date(s6)<=${hivevar:thistime}
       GROUP BY s6,cbrdint3,cattimg2)
-SELECT att_tmp.cbrdint3,
-       att_tmp.s6,
+SELECT att_tmp.cbrdint3 AS model,
+       att_tmp.s6 AS time,
        g1_cot,
+       cattimg2,
        att_cot/g1_cot AS per
 FROM g1_tmp
 JOIN att_tmp

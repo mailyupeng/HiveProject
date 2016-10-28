@@ -3,7 +3,8 @@ WITH g1_tmp AS(
      SELECT concat(cbrdint3,mth) AS mt,
             mth,cbrdint3,count(DISTINCT g1) AS g1_cot
      FROM bca LATERAL VIEW explode(brdint3) tbrdint3 AS cbrdint3
-     WHERE mth BETWEEN ${hivevar:lastmth} AND ${hivevar:thismth}
+     WHERE mth BETWEEN ${hivevar:lastmth}
+     AND ${hivevar:thismth}
      GROUP BY mth,cbrdint3
 ),
 att_tmp AS(
@@ -22,6 +23,7 @@ att_tmp AS(
 SELECT att_tmp.cbrdint3,
        att_tmp.mth,
        g1_cot,
+       cattimg2,
        att_cot/g1_cot AS per
 FROM g1_tmp
 JOIN att_tmp
