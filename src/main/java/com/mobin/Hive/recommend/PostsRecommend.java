@@ -41,11 +41,11 @@ public class PostsRecommend {
 
             //判断品牌条件
             if (b2.equals("b2")) {
-                String b2_condition = " AND (array_contains(b2titleCredit," + brandNum + ") OR array_contains(b2cengCredit," + b2 + "))";
+                String b2_condition = " AND (array_contains(b2titleCredit," + brandNum + ") OR array_contains(b2cengCredit," + brandNum + "))";
                 sb.append(b2_condition);
             }
             if (b3.equals("b3")) {
-                String b3_condition = " AND (array_contains(b3titleCredit," + brandNum + ") OR array_contains(b3cengCredit," + b3 + "))";
+                String b3_condition = " AND (array_contains(b3titleCredit," + brandNum + ") OR array_contains(b3cengCredit," + brandNum + "))";
                 sb.append(b3_condition);
             }
 
@@ -77,10 +77,10 @@ public class PostsRecommend {
         System.out.println(hql);
      //   executeHql(hql);   //执行HQL
 
-        if(postsNum < 5)  //不足篇数
+        if(postsNum < limit)  //不足篇数
             query1(brandNum,b2,b3,limit - postsNum,date);
 
-        if(postsNum < 5)  //仍然不足篇数
+        if(postsNum < limit)  //仍然不足篇数
             query2(brandNum,b2,b3, limit - postsNum,date);
     }
 

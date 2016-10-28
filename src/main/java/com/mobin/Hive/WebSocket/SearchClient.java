@@ -34,6 +34,7 @@ public class SearchClient {
         public double per1;
         public int type;
 
+
         @Override
         public String toString() {
             return "Message{" +
@@ -62,7 +63,6 @@ public class SearchClient {
         public String author;
     }
 
-
     @OnOpen
     public void onOpen(Session session) {
         System.out.println("Connected to endpoint: " + session.getBasicRemote());
@@ -70,44 +70,47 @@ public class SearchClient {
 
     @OnMessage
     public void onMessage(String message) {
-        //System.out.println(message);
+        System.out.println(message);
+        String b2Num = null;
+        String b3Num = null;
+        String g1 = null;
         SearchClient searchBean = JSON.parseObject(message,SearchClient.class);
-        if(!searchBean.sender.equals("mobin")){  //判断是否是自己的发送信息
+        if(!searchBean.sender.equals("self")){  //判断是否是自己的发送信息
             Message ms = JSON.parseObject(searchBean.message,Message.class); //客户端发送过来的message JSON是查询所需的数据
 
             //拼接查询条件
             StringBuffer condition = new StringBuffer();
-            if(ms.authorList.size()>=1){
+            if(ms.authorList.size()>=1){   //有g1
                 List<Author> authors = ms.authorList;
-                condition.append(" AND ");
-                condition.append("(");
-                for(int i = 0; i < authors.size(); i ++){
-                    if(i == 0)
-                        condition.append("g1=" + authors.get(i).author + "");
-                    else
-                        condition.append(" OR g1=" + authors.get(i).author + "");
+                       g1 = authors.get(0).author;
+                for(Keyword keywords: ms.keyWordList) {
+                    if (keywords.type.equals("B2")) {
+                        b2Num = keywords.keyWord;
+                    } else if (keywords.type.equals("B3")) {
+                        b3Num = keywords.keyWord;
+                    }
+
                 }
-                condition.append(")");
+                Search.query(g1,b2Num,b3Num,ms.startTime,ms.endTime,20);
+            }else{  //没有g1
+                for(Keyword keywords: ms.keyWordList){
+                    if(keywords.type.equals("B2")){
+                        b2Num = keywords.keyWord;
+                    }else if(keywords.type.equals("B3")){
+                        b3Num = keywords.keyWord;
+                    }
+                    else if(keywords.type.equals("C")){
+                        condition.append(" AND c6=" + keywords.keyWord);
+                    }else if(keywords.type.equals("A")){
+                        condition.append(" AND A4=" + keywords.keyWord);
+                    }else if(keywords.type.equals("FM")){
+                        condition.append(" AND fm=" + keywords.keyWord);
+                    }
+                }
             }
             //B2对应品牌   B3对应车系
-            for(Keyword keywords: ms.keyWordList){
-                if(keywords.type.equals("B2")){
-                    condition.append(" AND b2a=" + keywords.keyWord);
-                }else if(keywords.type.equals("B3")){
-                    condition.append(" OR b3b=" + keywords.keyWord);
-                }
-                else if(keywords.type.equals("C")){
-                    condition.append(" AND c6=" + keywords.keyWord);
-                }else if(keywords.type.equals("A")){
-                    condition.append(" AND A4=" + keywords.keyWord);
-                }
-            }
-
-
-            System.out.println(condition.toString());
-            Search.query(condition.toString(),20); //执行HQL
+            //condition.append(" AND to_date(s6) BETWEEN " + "2016-04-01"+ " AND " + "2016-04-28");
         }
-
 
     }
 
@@ -119,7 +122,7 @@ public class SearchClient {
     public static void websocketTest() {
         try {
                     WebSocketContainer container = ContainerProvider.getWebSocketContainer(); // 获取WebSocket连接器，其中具体实现可以参照websocket-api.jar的源码,Class.forName("org.apache.tomcat.websocket.WsWebSocketContainer");
-                    String uri = "ws://web.dgchina.com:8080/itrac/ws/mobin";
+                    String uri = "ws://web.dgchina.com:8080/itrac/ws/self";
                     Session session = container.connectToServer(SearchClient.class, new URI(uri)); // 连接会话
                     int count = 1;
                     while (true) {

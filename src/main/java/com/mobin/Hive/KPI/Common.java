@@ -111,25 +111,25 @@ public class Common {
     * 7:品牌形象指标评价
     * */
     public void query(int lastMth, int thisMth,String lastTime,String startTime, int Num,int date) throws SQLException {
-             //Comment.query(lastMth, thisMth, lastTime, startTime, Num,date);
-            // BrandEvaluate.query(lastMth, thisMth, lastTime, startTime, Num,date);
+            // Comment.query(lastMth, thisMth, lastTime, startTime, Num,date);
+             BrandEvaluate.query(lastMth, thisMth, lastTime, startTime, Num,date);
              Brd3Evaluate.query(lastMth, thisMth, lastTime, startTime, Num,date);
-           // QualityEvalute.query(lastMth, thisMth, lastTime, startTime, Num,date);
-             //Source.query(lastMth, thisMth, lastTime, startTime,  Num,date);
+             QualityEvalute.query(lastMth, thisMth, lastTime, startTime, Num,date);
+             Source.query(lastMth, thisMth, lastTime, startTime,  Num,date);
     }
     //脚本输入参数为时间(格式:yyyy-MM-dd)和X线编号(1:日线，2：三天线，3：周线，4：月线)
     public static void main(String[] args) throws ParseException, SQLException, IOException {
         Common common = new Common();
         int[] types = new int[]{1,3,4,6,7};
-        if(args[1].equals("1")){       //日线
+        if(args[1].equals("1"))       //日线
                 common.dayLine(args[0]);
-        }else if(args[1].equals("2")){  //三天线
+        else if(args[1].equals("2"))  //三天线
                 common.threeDayLine(args[0]);
-        }else if(args[1].equals("3")){   //周线
+        else if(args[1].equals("3"))   //周线
                 common.weekLine(args[0]);
-        }else if(args[1].equals("4")){   //月线
+        else if(args[1].equals("4"))  //月线
                 common.monthLine(args[0]);
-        }else {
+        else {
             System.err.println("请输入正确的参数！");
             return;
         }

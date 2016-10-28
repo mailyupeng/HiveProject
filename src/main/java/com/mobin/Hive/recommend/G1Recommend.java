@@ -86,9 +86,8 @@ public class G1Recommend {
                 g1.setS8a(rs.getString("s8a"));
                 g1Beens.add(g1);
             }
-            //传输数据
-            System.out.println(JSON.toJSONString(g1Beens));
 
+            //传输数据
              //Utils.transData(g1Beens,2,date);
             pstm.close();
             ds.close();
